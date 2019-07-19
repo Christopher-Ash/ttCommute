@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1024306376681",
+    "firebase_url": "https://email-confirmation-14c1e.firebaseio.com",
+    "project_id": "email-confirmation-14c1e",
+    "storage_bucket": "email-confirmation-14c1e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024306376681:android:325409a9dd6e12e5",
+        "android_client_info": {
+          "package_name": "com.example.ttcommute"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1024306376681-84c9b0g7j6gfkfeim62s5kl8310pc9jp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVw3YhHfoC0evpf8AlU-yPa7N5ffmSKSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1024306376681-84c9b0g7j6gfkfeim62s5kl8310pc9jp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
