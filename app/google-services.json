@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1024306376681-5am1eegcqhqt66g09o8v5ve6sjm6s2el.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ttcommute",
+            "certificate_hash": "4b7f40a2dfb449d87f45b498569bd11cecd3297a"
+          }
+        },
+        {
           "client_id": "1024306376681-84c9b0g7j6gfkfeim62s5kl8310pc9jp.apps.googleusercontent.com",
           "client_type": 3
         }
