@@ -62,8 +62,8 @@
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/button_googlelogin"
-        android:layout_width="133dp"
-        android:layout_height="42dp"
+        android:layout_width="179dp"
+        android:layout_height="43dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -104,6 +104,21 @@
         app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/ttCommuteTextAlone_V1" />
 -->
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/button_fblogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.441"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.239"
+        tools:text="@string/common_signin_button_text" />
 
     <TextView
         android:id="@+id/password_forget"
@@ -148,22 +163,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.573" />
-
-    <Button
-        android:id="@+id/button_fblogin"
-        android:layout_width="78dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="FB"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.454"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.229" />
 
     <EditText
         android:id="@+id/username_login"

@@ -2,4 +2,5 @@
     <string name="app_name">ttCommute</string>
     <string name="facebook_app_id">463866110861691</string>
     <string name="fb_login_protocol_scheme">fb463866110861691</string>
+    <string name="web_client_id">1024306376681-84c9b0g7j6gfkfeim62s5kl8310pc9jp.apps.googleusercontent.com</string>
 </resources>
