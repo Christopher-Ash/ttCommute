@@ -46,7 +46,7 @@ public class PasswordResetActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 Toast.makeText(PasswordResetActivity.this, "Email sent! Please check your email to reset your password", Toast.LENGTH_LONG).show();
                                 finish();
-                                startActivity(new Intent(PasswordResetActivity.this, MainActivity.class));
+                                startActivity(new Intent(PasswordResetActivity.this, LoginActivity.class));
                             } else {
                                 Toast.makeText(PasswordResetActivity.this, "Email could not be sent to address provided", Toast.LENGTH_LONG).show();
                             }
