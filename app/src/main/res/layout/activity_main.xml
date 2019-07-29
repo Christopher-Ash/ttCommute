@@ -13,11 +13,23 @@
         android:layout_height="0dp"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintHorizontal_bias="1.0"
         mapbox:layout_constraintStart_toStartOf="parent"
         mapbox:layout_constraintTop_toTopOf="parent"
+        mapbox:layout_constraintVertical_bias="1.0"
         mapbox:mapbox_cameraTargetLat="10.6918"
         mapbox:mapbox_cameraTargetLng="-61.2225"
         mapbox:mapbox_cameraTilt="0"
-        mapbox:mapbox_cameraZoom="8.51" />
+        mapbox:mapbox_cameraZoom="8.51">
+
+        <Button
+            android:id="@+id/navbutton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#CC1251"
+            android:text="@string/start_navigation"
+            android:textColor="#FFFFFF" />
+    </com.mapbox.mapboxsdk.maps.MapView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

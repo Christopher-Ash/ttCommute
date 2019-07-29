@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -27,6 +31,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:8.1.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.41.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }
 

@@ -2,5 +2,6 @@
     <string name="app_name">ttCommute</string>
 
     <string name="hello_world">Hello there World</string>
+    <string name="start_navigation">Start Navigation</string>
 
 </resources>
