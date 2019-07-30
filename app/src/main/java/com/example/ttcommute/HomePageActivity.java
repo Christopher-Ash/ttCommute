@@ -67,19 +67,22 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser() ==null){
+                if (firebaseAuth.getCurrentUser() == null) {
                     startActivity(new Intent(HomePageActivity.this, MainActivity.class));
                 }
             }
         };
 
-        logout = (Button)findViewById(R.id.button_logout);
+        logout = (Button) findViewById(R.id.button_logout);
 
-        logout.setOnClickListener(new View.OnClickListener(){
+        logout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 mAuth.signOut();
+            }
+        });
     }
+
 
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
@@ -100,10 +103,13 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
 
+
     @Override
     public void onStart() {
         super.onStart();
         mapView.onStart();
+
+        mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
@@ -142,11 +148,5 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         mapView.onSaveInstanceState(outState);
 
     }
-            @Override
-            protected void onStart(){
-                super.onStart();
-
-                mAuth.addAuthStateListener(mAuthListener);
-            }
 
 }
