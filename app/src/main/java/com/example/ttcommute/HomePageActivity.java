@@ -68,7 +68,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() == null) {
-                    startActivity(new Intent(HomePageActivity.this, MainActivity.class));
+                    startActivity(new Intent(HomePageActivity.this, LoginActivity.class));
                 }
             }
         };

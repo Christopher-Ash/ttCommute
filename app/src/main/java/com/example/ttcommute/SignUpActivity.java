@@ -58,7 +58,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 // Sign in success
                                 sendEmailVerify();;
                                 //Toast.makeText(SignUpActivity.this, "Registration Complete! Verification Email has been sent to you", Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
 
                             } else {
                                 // If sign in fails, display a message to the user
@@ -71,7 +71,7 @@ public class SignUpActivity extends AppCompatActivity {
                     existingaccount.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                         }
                     });
                 }
@@ -107,7 +107,7 @@ public class SignUpActivity extends AppCompatActivity {
                         Toast.makeText(SignUpActivity.this, "Registration Complete! Verification email sent",Toast.LENGTH_SHORT).show();
                         mAuth.signOut();
                         finish();
-                        startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                        startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                     }
                     else{
                         Toast.makeText(SignUpActivity.this, "Verification email can't be sent", Toast.LENGTH_SHORT).show();
