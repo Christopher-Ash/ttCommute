@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">ttCommute</string>
-
     <string name="hello_world">Hello there World</string>
     <string name="start_navigation">Start Navigation</string>
-
+    <string name="access_token" translatable="false">pk.eyJ1IjoiYWdpbGVkdmxwcnMiLCJhIjoiY2p5MmJoZ2M5MG4yNzNubzl4OWhoeXhsdCJ9.WmL_jPNz_gvm889pHwsr_w</string>
+    <string name="user_location_permission_explanation">This app needs location permissions to show its functionality.</string>
+    <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
 </resources>
