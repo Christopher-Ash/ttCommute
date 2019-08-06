@@ -41,10 +41,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import android.util.Log;
 
+//classes needed for map restriction
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+
 // classes needed to launch navigation UI
 import android.view.View;
 import android.widget.Button;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapClickListener, PermissionsListener {
@@ -61,6 +67,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // variables needed to initialize navigation
     private Button button;
 
+    //variables for map restriction
+    private static final LatLng BOUND_CORNER_NW = new LatLng(10.6, -60.9); //latitude is bottom longitude is right
+    private static final LatLng BOUND_CORNER_SE = new LatLng(10.9, -61.55); //lattitude is top and longitude is bottom
+    private static final LatLngBounds RESTRICTED_BOUNDS_AREA = new LatLngBounds.Builder()
+            .include(BOUND_CORNER_NW)
+            .include(BOUND_CORNER_SE)
+            .build();
+
+    private final List<List<Point>> points = new ArrayList<>();
+    private final List<Point> outerPoints = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +91,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
+
+        //Set the boundary area for the map area
+        mapboxMap.setLatLngBoundsForCameraTarget(RESTRICTED_BOUNDS_AREA);
+
+        //Set the minimum zoom level of the map camera
+        mapboxMap.setMinZoomPreference(8);
+
+
+
         mapboxMap.setStyle(getString(R.string.navigation_guidance_day), new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
