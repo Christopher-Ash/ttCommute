@@ -1,152 +1,63 @@
 package com.example.ttcommute;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import androidx.annotation.NonNull;
-
+import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.Style;
+public class HomePageActivity extends FragmentActivity implements OnMapReadyCallback {
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+    private GoogleMap mMap;
+    // Create a LatLngBounds that includes the country of Trinidad and Tobago.
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-
-import com.google.firebase.auth.FirebaseAuth;
-
-
-
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-
-import java.util.ArrayList;
-import java.util.List;
-
-
-
-/**
- * Restrict the map camera to certain bounds.
- */
-public class HomePageActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-    private static final LatLng BOUND_CORNER_NW = new LatLng(10.6, -60.9); //latitude is bottom longitude is right
-    private static final LatLng BOUND_CORNER_SE = new LatLng(10.9, -61.55); //lattitude is top and longitude is bottom
-    private static final LatLngBounds RESTRICTED_BOUNDS_AREA = new LatLngBounds.Builder()
-            .include(BOUND_CORNER_NW)
-            .include(BOUND_CORNER_SE)
-            .build();
-
-    private final List<List<Point>> points = new ArrayList<>();
-    private final List<Point> outerPoints = new ArrayList<>();
-    private MapView mapView;
-    private Button logout;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+    private LatLngBounds TrinidadTobago = new LatLngBounds(
+            new LatLng(10.0470227, -61.9326551), new LatLng(11.346644, -60.4825221));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Mapbox.getInstance(this, "pk.eyJ1IjoiY2hyaXMtNCIsImEiOiJjanhuejl5ZjcwMWs1M2JyeDBseHo0aDg0In0.4WvPzipWFjZ7cLlXE3r2Mg");
-        setContentView(R.layout.activity_home_page);
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
 
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null) {
-                    startActivity(new Intent(HomePageActivity.this, LoginActivity.class));
-                }
-            }
-        };
+        setContentView(R.layout.activity_home_page2);
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
 
-        logout = (Button) findViewById(R.id.button_logout);
-
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signOut();
-            }
-        });
-    }
+        mapFragment.getMapAsync(this);
+}
 
 
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
     @Override
-    public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-        mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
-            @Override
-            public void onStyleLoaded(@NonNull Style style) { // Map is set up and the style has loaded. Now you can add data or make other map adjustments
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
 
+        // Constrain the camera target to the Adelaide bounds.
+        mMap.setLatLngBoundsForCameraTarget(TrinidadTobago);
 
-                //Set the boundary area for the map camera
-                mapboxMap.setLatLngBoundsForCameraTarget(RESTRICTED_BOUNDS_AREA);
+        // Set a preference for minimum and maximum zoom.
+        mMap.setMinZoomPreference(9.5f);
+        mMap.setMaxZoomPreference(16.0f);
 
-                //Set the minimum zoom level of the map camera
-                mapboxMap.setMinZoomPreference(2);
+        
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(TrinidadTobago.getCenter(), 9));
 
-
-            }
-        });
+        // Add a marker in Sydney and move the camera
+        LatLng marker = new LatLng(10.6510516, -61.5101797);
+        mMap.addMarker(new MarkerOptions().position(marker).title("Port of Spain"));
     }
-
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mapView.onStart();
-
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-
-    }
-
 }
