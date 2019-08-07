@@ -1,36 +1,47 @@
 package com.example.ttcommute;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import java.util.List;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Parcelable;
 import android.widget.Toast;
 
-// classes needed to initialize map
+// Map initialization classes
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mapbox.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
-// classes needed to add the location component
+// Location component classes
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 
-// classes needed to add a marker
+// Marker addition classes
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;
+import com.mapbox.mapboxsdk.plugins.places.picker.PlacePicker;
+import com.mapbox.mapboxsdk.plugins.places.picker.model.PlacePickerOptions;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
-// classes to calculate a route
+// Route calculation classes
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncherOptions;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
@@ -46,14 +57,17 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
-// classes needed to launch navigation UI
+
+// Navigation UI classes
 import android.view.View;
 import android.widget.Button;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
 import java.util.ArrayList;
+import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapClickListener, PermissionsListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapClickListener,
+        PermissionsListener{
     // variables for adding location layer
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -65,7 +79,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String TAG = "DirectionsActivity";
     private NavigationMapRoute navigationMapRoute;
     // variables needed to initialize navigation
-    private Button button;
+    private FloatingActionButton button;
+    //variables for search
+    private FloatingActionButton search;
+    private static final int REQUEST_CODE_AUTOCOMPLETE =1;
+    //variable to filter country in search
+    private List<String> countries = new ArrayList<>();
+    //place picker variable
+    private static final int PLACE_SELECTION_REQUEST_CODE = 56789;
+
 
     //variables for map restriction
     private static final LatLng BOUND_CORNER_NW = new LatLng(10, -60); //latitude is bottom longitude is right
@@ -108,7 +130,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 addDestinationIconSymbolLayer(style);
 
                 mapboxMap.addOnMapClickListener(MainActivity.this);
+                search = findViewById(R.id.searchbutton);
+                search.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        searchActivity();
+                    }
+                });
+
                 button = findViewById(R.id.navbutton);
+                button.setEnabled(false);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -125,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //method to add destination layer
     private void addDestinationIconSymbolLayer(@NonNull Style loadedMapStyle) {
         loadedMapStyle.addImage("destination-icon-id",
                 BitmapFactory.decodeResource(this.getResources(), R.drawable.mapbox_marker_icon_default));
@@ -139,13 +171,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         loadedMapStyle.addLayer(destinationSymbolLayer);
     }
 
+
+    //method to drop marker and draw route when map is clicked
     @SuppressWarnings( {"MissingPermission"})
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
+        Intent intent = new PlacePicker.IntentBuilder()
+                .accessToken(Mapbox.getAccessToken())
+                .placeOptions(
+                        PlacePickerOptions.builder()
+                                .statingCameraPosition(
+                                        new CameraPosition.Builder()
+                                                .target(point)
+                                                .zoom(16)
+                                                .build())
+                                .build())
+                .build(this);
+        startActivityForResult(intent, PLACE_SELECTION_REQUEST_CODE);
+
+
 
         Point destinationPoint = Point.fromLngLat(point.getLongitude(), point.getLatitude());
         Point originPoint = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
                 locationComponent.getLastKnownLocation().getLatitude());
+
 
         GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
         if (source != null) {
@@ -158,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return true;
     }
 
+    //method to calculate route between user location and marker
     private void getRoute(Point origin, Point destination) {
         NavigationRoute.builder(this)
                 .accessToken(Mapbox.getAccessToken())
@@ -195,6 +245,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
     }
 
+    //method to enable the location component. This enables the user's current location to be seen on th map via a puck
+    //It checks user permissions with respect to the access of user location as well
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
         // Check if permissions are enabled and if not request
@@ -232,6 +284,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
+    //method enabling search with
+    private void searchActivity(){
+
+        Intent intent = new PlaceAutocomplete.IntentBuilder()
+                .accessToken(Mapbox.getAccessToken())
+                //.placeOptions(placeOptions)
+                .build(this);
+        startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
+
+    }
+
+    //activity result for location search and picker
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_AUTOCOMPLETE) {
+            CarmenFeature feature = PlaceAutocomplete.getPlace(data);
+            Toast.makeText(this, feature.text(), Toast.LENGTH_LONG).show();
+        } else {
+            if (requestCode == PLACE_SELECTION_REQUEST_CODE && resultCode == RESULT_OK) {
+
+                // Retrieve the information from the selected location's CarmenFeature
+
+                CarmenFeature carmenFeature = PlacePicker.getPlace(data);
+            }
+        }
+    }
+
+
+
+    //map display methods
     @Override
     protected void onStart() {
         super.onStart();

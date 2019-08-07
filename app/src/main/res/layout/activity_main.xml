@@ -7,28 +7,56 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/navbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        mapbox:backgroundTint="#9C2929"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintHorizontal_bias="0.925"
+        mapbox:layout_constraintStart_toStartOf="@+id/mapView"
+        mapbox:layout_constraintTop_toTopOf="parent"
+        mapbox:layout_constraintVertical_bias="0.655"
+        mapbox:srcCompat="@drawable/ic_navigation"
+        android:focusable="true" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/searchbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        mapbox:backgroundTint="#9C2929"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintHorizontal_bias="0.976"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintTop_toTopOf="@+id/mapView"
+        mapbox:layout_constraintVertical_bias="0.169"
+        mapbox:srcCompat="@android:drawable/ic_menu_search"
+        android:focusable="true" />
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
-        mapbox:layout_constraintHorizontal_bias="1.0"
+        mapbox:layout_constraintHorizontal_bias="0.0"
         mapbox:layout_constraintStart_toStartOf="parent"
         mapbox:layout_constraintTop_toTopOf="parent"
-        mapbox:layout_constraintVertical_bias="1.0"
+        mapbox:layout_constraintVertical_bias="0.0"
         mapbox:mapbox_cameraTargetLat="10.6918"
         mapbox:mapbox_cameraTargetLng="-61.2225"
         mapbox:mapbox_cameraTilt="0"
-        mapbox:mapbox_cameraZoom="8.51">
+        mapbox:mapbox_cameraZoom="8.51" >
 
-        <Button
-            android:id="@+id/navbutton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#CC1251"
-            android:text="@string/start_navigation"
-            android:textColor="#FFFFFF" />
     </com.mapbox.mapboxsdk.maps.MapView>
 
 
