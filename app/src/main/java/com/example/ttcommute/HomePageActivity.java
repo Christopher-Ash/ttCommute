@@ -1,8 +1,13 @@
 package com.example.ttcommute;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.Location;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -11,9 +16,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 
-public class HomePageActivity extends FragmentActivity implements OnMapReadyCallback {
+import android.Manifest;
+import android.content.pm.PackageManager;
 
+
+
+public class HomePageActivity extends FragmentActivity
+        implements OnMyLocationButtonClickListener,
+        OnMyLocationClickListener,
+        OnMapReadyCallback {
+
+    private static final int PERMISSION_ACCESS_COARSE_LOCATION = 0;
     private GoogleMap mMap;
     // Create a LatLngBounds that includes the country of Trinidad and Tobago.
 
@@ -30,7 +46,13 @@ public class HomePageActivity extends FragmentActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
-}
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
+                    PERMISSION_ACCESS_COARSE_LOCATION);
+        }
+    }
 
 
     /**
@@ -46,7 +68,19 @@ public class HomePageActivity extends FragmentActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Constrain the camera target to the Adelaide bounds.
+        // TODO: Before enabling the My Location layer, you must request
+        // location permission from the user. This sample does not include
+        // a request for location permission.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            // Show rationale and request permission.
+        }
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+
+        // Constrain the camera target to the Trinidad & Tobago bounds.
         mMap.setLatLngBoundsForCameraTarget(TrinidadTobago);
 
         // Set a preference for minimum and maximum zoom.
@@ -59,5 +93,19 @@ public class HomePageActivity extends FragmentActivity implements OnMapReadyCall
         // Add a marker in Sydney and move the camera
         LatLng marker = new LatLng(10.6510516, -61.5101797);
         mMap.addMarker(new MarkerOptions().position(marker).title("Port of Spain"));
+    }
+
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+        return false;
     }
 }
