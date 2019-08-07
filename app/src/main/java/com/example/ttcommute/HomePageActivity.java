@@ -29,7 +29,7 @@ public class HomePageActivity extends FragmentActivity
         OnMyLocationClickListener,
         OnMapReadyCallback {
 
-    private static final int PERMISSION_ACCESS_COARSE_LOCATION = 0;
+    private static final int PERMISSION_ACCESS_FINE_LOCATION = 0;
     private GoogleMap mMap;
     // Create a LatLngBounds that includes the country of Trinidad and Tobago.
 
@@ -47,12 +47,14 @@ public class HomePageActivity extends FragmentActivity
 
         mapFragment.getMapAsync(this);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
-                    PERMISSION_ACCESS_COARSE_LOCATION);
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION },
+                    PERMISSION_ACCESS_FINE_LOCATION);
         }
     }
+
+
 
 
     /**
@@ -76,6 +78,7 @@ public class HomePageActivity extends FragmentActivity
             mMap.setMyLocationEnabled(true);
         } else {
             // Show rationale and request permission.
+            Toast.makeText(this, "Permissions Not Granted for User Location!", Toast.LENGTH_SHORT).show();
         }
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
@@ -85,7 +88,7 @@ public class HomePageActivity extends FragmentActivity
 
         // Set a preference for minimum and maximum zoom.
         mMap.setMinZoomPreference(9.5f);
-        mMap.setMaxZoomPreference(16.0f);
+        mMap.setMaxZoomPreference(25.0f);
 
         
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(TrinidadTobago.getCenter(), 9));
