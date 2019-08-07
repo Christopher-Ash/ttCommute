@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button button;
 
     //variables for map restriction
-    private static final LatLng BOUND_CORNER_NW = new LatLng(10.6, -60.9); //latitude is bottom longitude is right
-    private static final LatLng BOUND_CORNER_SE = new LatLng(10.9, -61.55); //lattitude is top and longitude is bottom
+    private static final LatLng BOUND_CORNER_NW = new LatLng(10, -60); //latitude is bottom longitude is right
+    private static final LatLng BOUND_CORNER_SE = new LatLng(11, -62); //lattitude is top and longitude is bottom
     private static final LatLngBounds RESTRICTED_BOUNDS_AREA = new LatLngBounds.Builder()
             .include(BOUND_CORNER_NW)
             .include(BOUND_CORNER_SE)
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        boolean simulateRoute = true;
+                        boolean simulateRoute = false;
                         NavigationLauncherOptions options = NavigationLauncherOptions.builder()
                                 .directionsRoute(currentRoute)
                                 .shouldSimulateRoute(simulateRoute)
