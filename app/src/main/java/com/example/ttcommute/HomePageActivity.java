@@ -5,10 +5,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,6 +28,9 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.widget.ZoomControls;
 
+import java.io.IOException;
+import java.util.List;
+
 
 public class HomePageActivity extends FragmentActivity
         implements OnMyLocationButtonClickListener,
@@ -33,6 +39,10 @@ public class HomePageActivity extends FragmentActivity
 
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 0;
     private GoogleMap mMap;
+
+    //define for geolocation block. chk onCreate method
+    Button geoLocationbtn;
+
     // Create a LatLngBounds that includes the country of Trinidad and Tobago.
     private LatLngBounds TrinidadTobago = new LatLngBounds(
             new LatLng(10.0470227, -61.9326551), new LatLng(11.346644, -60.4825221));
@@ -75,6 +85,35 @@ public class HomePageActivity extends FragmentActivity
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
                     PERMISSION_ACCESS_COARSE_LOCATION);
         }
+        // search bar finding locations --works correctly
+        geoLocationbtn=(Button) findViewById(R.id.btSearch);
+        geoLocationbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText searchText = (EditText) findViewById(R.id.etLocationEntry);
+                String search = searchText.getText().toString();
+                if (search != null && !search.equals("")) {
+                    //List<android.location.Address> addressList = null;
+                    //structure to hold sec info
+                    List<Address> addressList = null;
+                    Geocoder geocoder = new Geocoder(HomePageActivity.this);
+                    //pop address ,ist
+                    try {
+                        addressList = geocoder.getFromLocationName(search, 1);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Address address = addressList.get(0); //first elemnt of addrlist
+                    //lon lat from address abive
+                    LatLng latLang = new LatLng(address.getLatitude(), address.getLongitude());
+                    //provided by android add class btw
+                    mMap.addMarker(new MarkerOptions().position(latLang).title("from geocoder"));
+                    //move camera
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLang));
+                }
+            }
+        });
     }
 
 
