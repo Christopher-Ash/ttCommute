@@ -2,8 +2,14 @@ package com.example.ttcommute;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,7 +20,10 @@ import android.widget.Toast;
 
 // Map initialization classes
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.api.geocoding.v5.models.CarmenFeature;
+import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -33,10 +42,16 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;
+import com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions;
 import com.mapbox.mapboxsdk.plugins.places.picker.PlacePicker;
 import com.mapbox.mapboxsdk.plugins.places.picker.model.PlacePickerOptions;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+
+import static com.mapbox.api.geocoding.v5.MapboxGeocoding.*;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
@@ -83,10 +98,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //variables for search
     private FloatingActionButton search;
     private static final int REQUEST_CODE_AUTOCOMPLETE =1;
+    public static final int MODE_FULLSCREEN = 1;
+    public int backgrounColor() {
+        return 0;
+    }
     //variable to filter country in search
     private List<String> countries = new ArrayList<>();
     //place picker variable
     private static final int PLACE_SELECTION_REQUEST_CODE = 56789;
+    //taxi stand locator variables
+    /*private FeatureCollection featureCollection;
+    private static final String PROPERTY_SELECTED = "selected";*/
 
 
     //variables for map restriction
@@ -108,6 +130,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        // Create a GeoJSON feature collection from the GeoJSON file in the assets folder.
+        /*try {
+            getFeatureCollectionFromJson();
+        } catch (Exception exception) {
+            Log.e("MapActivity", "onCreate: " + exception);
+            Toast.makeText(this, R.string.failure_to_load_file, Toast.LENGTH_LONG).show();
+        }*/
     }
 
     @Override
@@ -121,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapboxMap.setMinZoomPreference(8);
 
 
-
         mapboxMap.setStyle(getString(R.string.navigation_guidance_day), new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
@@ -131,9 +159,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 mapboxMap.addOnMapClickListener(MainActivity.this);
                 search = findViewById(R.id.searchbutton);
-                search.setOnClickListener(new View.OnClickListener(){
+                search.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v){
+                    public void onClick(View v) {
                         searchActivity();
                     }
                 });
@@ -154,6 +182,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
             }
         });
+        //calling method to show markers
+/*
+        initTaxiLocationIconSymbolLayer();
+
+        //deals with how selected icon is presented
+
+        //initSelectedTaxiSymbolLayer();
+
+        // Create a list of features from the feature collection
+        List<Feature> featureList = featureCollection.features();
+
+        // Retrieve and update the source designated for showing the store location icons
+        GeoJsonSource source = mapboxMap.getStyle().getSourceAs("store-location-source-id");
+        if (source != null) {
+            source.setGeoJson(FeatureCollection.fromFeatures(featureList));
+        }
+
+        if (featureList != null) {
+
+            for (int x = 0; x < featureList.size(); x++) {
+
+                Feature singleLocation = featureList.get(x);
+
+                // Get the single location's String properties to place in its map marker
+                String singleLocationName = singleLocation.getStringProperty("name");
+                String singleLocationHours = singleLocation.getStringProperty("hours");
+                String singleLocationDescription = singleLocation.getStringProperty("description");
+                String singleLocationPhoneNum = singleLocation.getStringProperty("phone");
+
+
+                // Add a boolean property to use for adjusting the icon of the selected store location
+                singleLocation.addBooleanProperty(PROPERTY_SELECTED, false);
+
+                // Get the single location's LatLng coordinates
+                Point singleLocationPosition = (Point) singleLocation.geometry();
+
+                // Create a new LatLng object with the Position object created above
+                LatLng singleLocationLatLng = new LatLng(singleLocationPosition.latitude(),
+                        singleLocationPosition.longitude());
+
+            }
+        }*/
     }
 
     //method to add destination layer
@@ -285,37 +355,185 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    //method enabling search with
+
+    //method enabling search with filter
     private void searchActivity(){
 
         Intent intent = new PlaceAutocomplete.IntentBuilder()
                 .accessToken(Mapbox.getAccessToken())
-                //.placeOptions(placeOptions)
+                .placeOptions(PlaceOptions.builder()
+                        //restricting search to Trinidad
+                        .country("TT")
+                        .backgroundColor(Color.parseColor("#1094A5"))
+                        .build(PlaceOptions.MODE_FULLSCREEN)
+
+                )
                 .build(this);
         startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
+        //option to clear recent history
+        PlaceAutocomplete.clearRecentHistory(this);
 
     }
+
+
 
     //activity result for location search and picker
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //search activity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_AUTOCOMPLETE) {
             CarmenFeature feature = PlaceAutocomplete.getPlace(data);
             Toast.makeText(this, feature.text(), Toast.LENGTH_LONG).show();
+            geoCoder(feature.text());
+
         } else {
+            //location picker activity
             if (requestCode == PLACE_SELECTION_REQUEST_CODE && resultCode == RESULT_OK) {
 
                 // Retrieve the information from the selected location's CarmenFeature
 
                 CarmenFeature carmenFeature = PlacePicker.getPlace(data);
+                geoCoder(carmenFeature.text());
+
+
             }
+        }
+    }
+
+    //geocoding redirect after seach
+    protected void geoCoder(String data){
+        MapboxGeocoding mapboxGeocoding = MapboxGeocoding.builder()
+                .accessToken(Mapbox.getAccessToken())
+                .query(data)
+                .build();
+
+        mapboxGeocoding.enqueueCall(new Callback<GeocodingResponse>() {
+            @Override
+            public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
+
+                List<CarmenFeature> results = response.body().features();
+
+                if (results.size() > 0) {
+
+                    // Log the first results Point.
+                    Point firstResultPoint = results.get(0).center();
+                    Log.d(TAG, "onResponse: " + firstResultPoint.toString());
+                    //get point data in geojson point format
+                    Point originPoint = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
+                            locationComponent.getLastKnownLocation().getLatitude());
+                    //drop marker
+                    GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
+                    if (source != null) {
+                        source.setGeoJson(Feature.fromGeometry(firstResultPoint));
+                    }
+                    //get route
+                    getRoute(originPoint, firstResultPoint);
+                    button.setEnabled(true);
+
+
+
+                } else {
+
+                    // No result for your request were found.
+                    Log.d(TAG, "onResponse: No result found");
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        });
+
+    }
+
+
+    /*private void initSelectedTaxiSymbolLayer() {
+        Style style = mapboxMap.getStyle();
+        if (style != null) {
+
+            // Add the icon image to the map
+            style.addImage("selected-store-location-icon-id", customThemeManager.getSelectedMarkerIcon());
+
+            // Create and add the store location icon SymbolLayer to the map
+            SymbolLayer selectedStoreLocationSymbolLayer = new SymbolLayer("selected-store-location-layer-id",
+                    "store-location-source-id");
+            selectedStoreLocationSymbolLayer.withProperties(
+                    iconImage("selected-store-location-icon-id"),
+                    iconAllowOverlap(true)
+            );
+            selectedStoreLocationSymbolLayer.withFilter(eq((get(PROPERTY_SELECTED)), literal(true)));
+            style.addLayer(selectedStoreLocationSymbolLayer);
+        } else {
+            Log.d("StoreFinderActivity", "initSelectedStoreSymbolLayer: Style isn't ready yet.");
+            throw new IllegalStateException("Style isn't ready yet.");
+        }
+    }*/
+
+
+    //convert taxi_geojson file to a FeaturCollection object
+   /* private void getFeatureCollectionFromJson() throws IOException {
+        try {
+            // Use fromJson() method to convert the GeoJSON file into a usable FeatureCollection object
+            featureCollection = FeatureCollection.fromJson(loadGeoJsonFromAsset("taxi_stands"));
+
+        } catch (Exception exception) {
+            Log.e("MapActivity", "getFeatureCollectionFromJson: " + exception);
+        }
+    }*/
+
+    //load taxi stand locations from taxi_stands.geojson
+
+   /* private String loadGeoJsonFromAsset(String filename) {
+        try {
+            // Load the GeoJSON file from the local asset folder
+            InputStream is = getAssets().open(filename);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            return new String(buffer, "UTF-8");
+        } catch (Exception exception) {
+            Log.e("MapActivity", "Exception Loading GeoJSON: " + exception.toString());
+            exception.printStackTrace();
+            return null;
+        }
+    }
+
+    private void initTaxiLocationIconSymbolLayer() {
+        Style style = mapboxMap.getStyle();
+        if (style != null) {
+
+            // Create and add the GeoJsonSource to the map
+            GeoJsonSource taxiLocationGeoJsonSource = new GeoJsonSource("taxi-location-source-id");
+            style.addSource(taxiLocationGeoJsonSource);
+
+            // Create and add the taxi stand location icon SymbolLayer to the map
+
+            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.taxi_stand);
+            mapboxMap.getStyle().addImage("my-marker-image", icon);
+
+            SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+            symbolLayer.setProperties(
+                    PropertyFactory.iconImage("my-marker-image")
+            );
+
+            mapboxMap.getStyle().addLayer(symbolLayer);
+
+
+        } else {
+            Log.d("TaxiFinderActivity", "initTaxiLocationIconSymbolLayer: Style isn't ready yet.");
+
+            throw new IllegalStateException("Style isn't ready yet.");
         }
     }
 
 
 
+*/
     //map display methods
     @Override
     protected void onStart() {

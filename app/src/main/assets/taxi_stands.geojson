@@ -1,0 +1,145 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "La Horquetta Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.281468,
+          10.64088
+        ],
+        "type": "Point"
+      },
+      "id": "24a0747e1f2e54796b93c7ca5c003a34"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cumuto/Wallerfield Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.282518,
+          10.641558
+        ],
+        "type": "Point"
+      },
+      "id": "24e3bbab33afaad0e70a7657bb1cb484"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pinto Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.281657,
+          10.641611
+        ],
+        "type": "Point"
+      },
+      "id": "3d7d586d8a8552f1ad0850cd1c0934b4"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Valencia Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.281675,
+          10.641646
+        ],
+        "type": "Point"
+      },
+      "id": "4b2415ff81432048cfc5f60200d809b3"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Arima/Valencia/Port-of-Spain Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.130321,
+          10.586155
+        ],
+        "type": "Point"
+      },
+      "id": "6253a7af075a83bc89aef713dc23ee24"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Biche/Coalmine/Tamana Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.12995,
+          10.585817
+        ],
+        "type": "Point"
+      },
+      "id": "6409a6d618e43f229cd079c7e17cc25f"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Carapo Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.281124,
+          10.639195
+        ],
+        "type": "Point"
+      },
+      "id": "6513efb0169e2054ef5cda40bd9a21a5"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Arena/Brazil/Talparo Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.281319,
+          10.640099
+        ],
+        "type": "Point"
+      },
+      "id": "b5f563993fe8a3b06f381f628bfdc934"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cane Farm Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.352935,
+          10.640352
+        ],
+        "type": "Point"
+      },
+      "id": "f1d98eb9a3d5ee2567be974a9fe327f0"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Lopinot Road Taxi Stand"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.33588,
+          10.633872
+        ],
+        "type": "Point"
+      },
+      "id": "f52ca0ec66cf04be5e4bdd9050a3fc70"
+    }
+  ],
+  "type": "FeatureCollection"
+}
