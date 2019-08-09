@@ -7,6 +7,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,7 +23,7 @@ import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-
+import android.widget.ZoomControls;
 
 
 public class HomePageActivity extends FragmentActivity
@@ -32,20 +34,41 @@ public class HomePageActivity extends FragmentActivity
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 0;
     private GoogleMap mMap;
     // Create a LatLngBounds that includes the country of Trinidad and Tobago.
-
     private LatLngBounds TrinidadTobago = new LatLngBounds(
             new LatLng(10.0470227, -61.9326551), new LatLng(11.346644, -60.4825221));
+
+    Button clear;
+
+    // Zoom btn controls
+    ZoomControls zoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_home_page2);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
+
+        //Zoom control
+        zoom = (ZoomControls) findViewById(R.id.zcZoom);
+        //setting zoom -in and -out click listener
+        //zoom out
+        zoom.setOnZoomOutClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.animateCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
+        //zoom in
+        zoom.setOnZoomInClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.animateCamera(CameraUpdateFactory.zoomIn());
+            }
+        });
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -77,6 +100,17 @@ public class HomePageActivity extends FragmentActivity
         } else {
             // Show rationale and request permission.
         }
+
+        //block which places a marker based on user interaction
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mMap.addMarker(new MarkerOptions().position(latLng).title("from onMapClick"));
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
+            }
+        });
+
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
 
@@ -90,7 +124,7 @@ public class HomePageActivity extends FragmentActivity
         
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(TrinidadTobago.getCenter(), 9));
 
-        // Add a marker in Sydney and move the camera
+        // Add a marker in Trinidad and move the camera
         LatLng marker = new LatLng(10.6510516, -61.5101797);
         mMap.addMarker(new MarkerOptions().position(marker).title("Port of Spain"));
     }
