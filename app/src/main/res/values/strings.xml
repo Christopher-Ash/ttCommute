@@ -4,4 +4,7 @@
     <string name="fb_login_protocol_scheme">fb463866110861691</string>
     <string name="web_client_id">1024306376681-84c9b0g7j6gfkfeim62s5kl8310pc9jp.apps.googleusercontent.com</string>
     <string name="logout">Logout</string>
+    <string name="access_token" translatable="false">pk.eyJ1IjoiYWdpbGVkdmxwcnMiLCJhIjoiY2p5MmJoZ2M5MG4yNzNubzl4OWhoeXhsdCJ9.WmL_jPNz_gvm889pHwsr_w</string>
+    <string name="user_location_permission_explanation">This app needs location permissions to show its functionality.</string>
+    <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
 </resources>
