@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Retrieve the information from the selected location's CarmenFeature
 
                 CarmenFeature carmenFeature = PlacePicker.getPlace(data);
-                geoCoder(carmenFeature.text());
+                
 
 
             }
