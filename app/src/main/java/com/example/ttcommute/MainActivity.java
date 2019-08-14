@@ -16,9 +16,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Parcelable;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 // Map initialization classes
+import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.api.geocoding.v5.models.CarmenFeature;
@@ -26,6 +28,7 @@ import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -107,8 +110,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //place picker variable
     private static final int PLACE_SELECTION_REQUEST_CODE = 56789;
     //taxi stand locator variables
-    /*private FeatureCollection featureCollection;
-    private static final String PROPERTY_SELECTED = "selected";*/
+    private FeatureCollection featureCollection;
+    private static final String PROPERTY_SELECTED = "selected";
+    //filter display variables
+    private CheckBox showTaxi;            //chip to show taxis
+    private CheckBox showServices;        //chip to show essential serices
 
 
     //variables for map restriction
@@ -130,13 +136,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-        // Create a GeoJSON feature collection from the GeoJSON file in the assets folder.
-        /*try {
-            getFeatureCollectionFromJson();
-        } catch (Exception exception) {
-            Log.e("MapActivity", "onCreate: " + exception);
-            Toast.makeText(this, R.string.failure_to_load_file, Toast.LENGTH_LONG).show();
-        }*/
+
+
     }
 
     @Override
@@ -149,15 +150,52 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Set the minimum zoom level of the map camera
         mapboxMap.setMinZoomPreference(8);
 
-
         mapboxMap.setStyle(getString(R.string.navigation_guidance_day), new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
+
                 enableLocationComponent(style);
 
                 addDestinationIconSymbolLayer(style);
 
+                //layer chips setup
+                showTaxi =  findViewById(R.id.checkBox);
+                showServices = findViewById(R.id.checkBox2);
+
+
+
                 mapboxMap.addOnMapClickListener(MainActivity.this);
+
+                showTaxi.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        boolean checked = ((CheckBox) view).isChecked();
+                        if (checked)
+                            addTaxiIconSymbolLayer(style);
+
+                        else
+
+                            //remove layer
+                            removeTaxiIconLayer(style);
+                    }
+                });
+
+                showServices.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                boolean checked = ((CheckBox) view).isChecked();
+                                if (checked) {
+                                    addHospitalIconSymbolLayer(style);
+                                    addPoliceIconSymbolLayer(style);
+                                } else {
+                                    //remove layers
+                                    removeHospitalIconLayer(style);
+                                    removePoliceIconLayer(style);
+                                }
+                            }
+
+                } );
+
                 search = findViewById(R.id.searchbutton);
                 search.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -178,17 +216,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .build();
                         // Call this method with Context from within an Activity
                         NavigationLauncher.startNavigation(MainActivity.this, options);
+
                     }
                 });
             }
         });
         //calling method to show markers
-/*
-        initTaxiLocationIconSymbolLayer();
+
+
+        /*
 
         //deals with how selected icon is presented
 
-        //initSelectedTaxiSymbolLayer();
+        initSelectedTaxiSymbolLayer();
 
         // Create a list of features from the feature collection
         List<Feature> featureList = featureCollection.features();
@@ -225,6 +265,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }*/
     }
+
+    //checkbox method
+
 
     //method to add destination layer
     private void addDestinationIconSymbolLayer(@NonNull Style loadedMapStyle) {
@@ -301,7 +344,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         // Draw the route on the map
                         if (navigationMapRoute != null) {
-                            navigationMapRoute.removeRoute();
+                            //deprecated function
+                            //navigationMapRoute.removeRoute();
+                            navigationMapRoute.updateRouteArrowVisibilityTo(false);
+                            navigationMapRoute.updateRouteVisibilityTo(false);
                         } else {
                             navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap, R.style.NavigationMapRoute);
                         }
@@ -324,7 +370,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             // Activate the MapboxMap LocationComponent to show user location
             // Adding in LocationComponentOptions is also an optional parameter
             locationComponent = mapboxMap.getLocationComponent();
-            locationComponent.activateLocationComponent(this, loadedMapStyle);
+            //deprecated function commented out
+            //locationComponent.activateLocationComponent(this, loadedMapStyle);
+            LocationComponentActivationOptions locationComponentActivationOptions =
+                    LocationComponentActivationOptions.builder(this, loadedMapStyle)
+                    .useDefaultLocationEngine(true)
+                    .build();
+            locationComponent.activateLocationComponent(locationComponentActivationOptions);
             locationComponent.setLocationComponentEnabled(true);
             // Set the component's camera mode
             locationComponent.setCameraMode(CameraMode.TRACKING);
@@ -451,46 +503,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    /*private void initSelectedTaxiSymbolLayer() {
-        Style style = mapboxMap.getStyle();
-        if (style != null) {
+    //taxi hub data to display
 
-            // Add the icon image to the map
-            style.addImage("selected-store-location-icon-id", customThemeManager.getSelectedMarkerIcon());
+    //load points from geojson files in assets folder
 
-            // Create and add the store location icon SymbolLayer to the map
-            SymbolLayer selectedStoreLocationSymbolLayer = new SymbolLayer("selected-store-location-layer-id",
-                    "store-location-source-id");
-            selectedStoreLocationSymbolLayer.withProperties(
-                    iconImage("selected-store-location-icon-id"),
-                    iconAllowOverlap(true)
-            );
-            selectedStoreLocationSymbolLayer.withFilter(eq((get(PROPERTY_SELECTED)), literal(true)));
-            style.addLayer(selectedStoreLocationSymbolLayer);
-        } else {
-            Log.d("StoreFinderActivity", "initSelectedStoreSymbolLayer: Style isn't ready yet.");
-            throw new IllegalStateException("Style isn't ready yet.");
-        }
-    }*/
-
-
-    //convert taxi_geojson file to a FeaturCollection object
-   /* private void getFeatureCollectionFromJson() throws IOException {
+    private String loadJsonFromAsset(String nameOfLocalFile) {
         try {
-            // Use fromJson() method to convert the GeoJSON file into a usable FeatureCollection object
-            featureCollection = FeatureCollection.fromJson(loadGeoJsonFromAsset("taxi_stands"));
-
-        } catch (Exception exception) {
-            Log.e("MapActivity", "getFeatureCollectionFromJson: " + exception);
-        }
-    }*/
-
-    //load taxi stand locations from taxi_stands.geojson
-
-   /* private String loadGeoJsonFromAsset(String filename) {
-        try {
-            // Load the GeoJSON file from the local asset folder
-            InputStream is = getAssets().open(filename);
+            InputStream is = getAssets().open(nameOfLocalFile);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -503,37 +522,84 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void initTaxiLocationIconSymbolLayer() {
-        Style style = mapboxMap.getStyle();
-        if (style != null) {
-
-            // Create and add the GeoJsonSource to the map
-            GeoJsonSource taxiLocationGeoJsonSource = new GeoJsonSource("taxi-location-source-id");
-            style.addSource(taxiLocationGeoJsonSource);
-
-            // Create and add the taxi stand location icon SymbolLayer to the map
-
-            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.taxi_stand);
-            mapboxMap.getStyle().addImage("my-marker-image", icon);
-
-            SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
-            symbolLayer.setProperties(
-                    PropertyFactory.iconImage("my-marker-image")
-            );
-
-            mapboxMap.getStyle().addLayer(symbolLayer);
+    //defining layer to display taxi stand loctions
 
 
-        } else {
-            Log.d("TaxiFinderActivity", "initTaxiLocationIconSymbolLayer: Style isn't ready yet.");
+    private void addTaxiIconSymbolLayer(@NonNull Style MapStyle) {
+        Bitmap taxi_icon = BitmapFactory.decodeResource(getResources(), R.drawable.taxi_stand);
+        MapStyle.addImage("taxi-icon-id", taxi_icon);
+        GeoJsonSource mysource = new GeoJsonSource("taxi-source-id", loadJsonFromAsset("taxi_stands.geojson"));
+        MapStyle.addSource(mysource);
+        SymbolLayer taxiSymbolLayer = new SymbolLayer("taxi-symbol-layer-id", "taxi-source-id");
+        taxiSymbolLayer.withProperties(
+                iconImage("taxi-icon-id"),
+                iconAllowOverlap(true),
+                iconIgnorePlacement(true)
+        );
+        MapStyle.addLayer(taxiSymbolLayer);
+    }
 
-            throw new IllegalStateException("Style isn't ready yet.");
+    //remove taxi symbol layer
+    private void removeTaxiIconLayer(@NonNull Style MapStyle ){
+        if(mapboxMap != null && mapboxMap.getStyle() !=null){
+            mapboxMap.getStyle().removeLayer("taxi-symbol-layer-id");
+            mapboxMap.getStyle().removeSource("taxi-source-id");
+        }
+    }
+
+    //police statios location data to display
+
+
+    //defining layer to display taxi stand loctions
+
+
+    private void addPoliceIconSymbolLayer(@NonNull Style MapStyle) {
+        Bitmap police_icon = BitmapFactory.decodeResource(getResources(), R.drawable.police_station);
+        MapStyle.addImage("police-icon-id", police_icon);
+        GeoJsonSource mysource = new GeoJsonSource("police-source-id", loadJsonFromAsset("police_stations.geojson"));
+        MapStyle.addSource(mysource);
+        SymbolLayer policeSymbolLayer = new SymbolLayer("police-symbol-layer-id", "police-source-id");
+        policeSymbolLayer.withProperties(
+                iconImage("police-icon-id"),
+                iconAllowOverlap(true),
+                iconIgnorePlacement(true)
+        );
+        MapStyle.addLayer(policeSymbolLayer);
+
+    }
+
+    //remove police icon layer
+    private void removePoliceIconLayer(@NonNull Style MapStyle ){
+        if(mapboxMap != null && mapboxMap.getStyle() !=null){
+            mapboxMap.getStyle().removeLayer("police-symbol-layer-id");
+            mapboxMap.getStyle().removeSource("police-source-id");
+        }
+    }
+
+    private void addHospitalIconSymbolLayer(@NonNull Style MapStyle) {
+        Bitmap hospital_icon = BitmapFactory.decodeResource(getResources(), R.drawable.hospital);
+        MapStyle.addImage("hospital-icon-id", hospital_icon);
+        GeoJsonSource mysource = new GeoJsonSource("hospital-source-id", loadJsonFromAsset("hospitals.geojson"));
+        MapStyle.addSource(mysource);
+        SymbolLayer hospitalSymbolLayer = new SymbolLayer("hospital-symbol-layer-id", "hospital-source-id");
+        hospitalSymbolLayer.withProperties(
+                iconImage("hospital-icon-id"),
+                iconAllowOverlap(true),
+                iconIgnorePlacement(true)
+        );
+        MapStyle.addLayer(hospitalSymbolLayer);
+    }
+
+    //remove hospital layer
+    private void removeHospitalIconLayer(@NonNull Style MapStyle ){
+        if(mapboxMap != null && mapboxMap.getStyle() !=null){
+            mapboxMap.getStyle().removeLayer("hospital-symbol-layer-id");
+            mapboxMap.getStyle().removeSource("hospital-source-id");
         }
     }
 
 
 
-*/
     //map display methods
     @Override
     protected void onStart() {

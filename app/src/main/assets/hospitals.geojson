@@ -1,0 +1,47 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Port of Spain General Hospital"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.507804,
+          10.661839
+        ],
+        "type": "Point"
+      },
+      "id": "357499dc792955baab08b8eae541b125"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "San Fernando General Hospital"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.467869,
+          10.279375
+        ],
+        "type": "Point"
+      },
+      "id": "d20ce6edfb29b7a68f6e958d79ab474c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sangre Grande General Hospital"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.132906,
+          10.59647
+        ],
+        "type": "Point"
+      },
+      "id": "eacdf544103d16ff537499130fd8860f"
+    }
+  ],
+  "type": "FeatureCollection"
+}

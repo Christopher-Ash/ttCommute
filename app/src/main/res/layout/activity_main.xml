@@ -48,15 +48,26 @@
         android:layout_height="0dp"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
-        mapbox:layout_constraintHorizontal_bias="0.0"
+        mapbox:layout_constraintHorizontal_bias="1.0"
         mapbox:layout_constraintStart_toStartOf="parent"
         mapbox:layout_constraintTop_toTopOf="parent"
         mapbox:layout_constraintVertical_bias="0.0"
         mapbox:mapbox_cameraTargetLat="10.6918"
         mapbox:mapbox_cameraTargetLng="-61.2225"
         mapbox:mapbox_cameraTilt="0"
-        mapbox:mapbox_cameraZoom="8.51" >
+        mapbox:mapbox_cameraZoom="8.51">
 
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="115dp"
+            android:layout_height="98dp"
+            android:text="Taxi Stands" />
+
+        <CheckBox
+            android:id="@+id/checkBox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Essential Services" />
     </com.mapbox.mapboxsdk.maps.MapView>
 
 
