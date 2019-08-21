@@ -9,8 +9,13 @@ import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import androidx.annotation.NonNull;
@@ -25,10 +30,14 @@ import android.widget.Toast;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.JsonObject;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
+import com.mapbox.api.matching.v5.MapboxMapMatching;
+import com.mapbox.api.matching.v5.models.MapMatchingResponse;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.LineString;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
@@ -54,6 +63,7 @@ import com.mapbox.mapboxsdk.plugins.places.picker.model.PlacePickerOptions;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import static com.google.gson.internal.bind.TypeAdapters.URI;
 import static com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_DRIVING;
 import static com.mapbox.api.geocoding.v5.MapboxGeocoding.*;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
@@ -87,6 +97,7 @@ import android.widget.Button;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapLongClickListener,
@@ -154,23 +165,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         pt_points.add(Point.fromLngLat( -61.281657, 10.641611));
         pt_points.add(Point.fromLngLat(-61.282518, 10.641558));
         pt_points.add(Point.fromLngLat(-61.28452294350522, 10.641196972327819));
-
-
-
-        pt_points.add(Point.fromLngLat(  -61.283916535985526,
-                10.638724752994207));
-        pt_points.add(Point.fromLngLat( -61.292338862708775,
-                10.634332099573243));
-        pt_points.add(Point.fromLngLat(   -61.29462973553771,
-                10.6285266364807));
-        pt_points.add(Point.fromLngLat(  -61.30554507092826,
-                10.626252983950707));
-        pt_points.add(Point.fromLngLat(-61.320727718501686,
-                10.627820260727674));
-        pt_points.add(Point.fromLngLat( -61.33081205100312,
-                10.635126755007192));
-        pt_points.add(Point.fromLngLat(  -61.33512428227614,
-                10.63559030333208));
+        pt_points.add(Point.fromLngLat(  -61.283916535985526, 10.638724752994207));
+        pt_points.add(Point.fromLngLat( -61.292338862708775, 10.634332099573243));
+        pt_points.add(Point.fromLngLat(   -61.29462973553771, 10.6285266364807));
+        pt_points.add(Point.fromLngLat(  -61.30554507092826, 10.626252983950707));
+        pt_points.add(Point.fromLngLat(-61.320727718501686, 10.627820260727674));
+        pt_points.add(Point.fromLngLat( -61.33081205100312, 10.635126755007192));
+        pt_points.add(Point.fromLngLat(  -61.33512428227614, 10.63559030333208));
 
 
         Mapbox.getInstance(this, getString(R.string.access_token));
@@ -222,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (checked)
                             addIconSymbolLayer(R.drawable.taxi_stand, "taxi-icon-id",
                                     "taxi-source-id", "taxi_stands.geojson", "taxi-symbol-layer-id");
-
                         else
 
                             //remove layer
@@ -231,23 +231,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
 
                 showServices.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                boolean checked = ((CheckBox) view).isChecked();
-                                if (checked) {
-                                    //add hospital and police station symbol layers
-                                    addIconSymbolLayer(R.drawable.hospital, "hospital-icon-id",
-                                            "hospital-source-id", "hospitals.geojson", "hospital-symbol-layer-id");
-                                    addIconSymbolLayer(R.drawable.police_station, "police-icon-id",
-                                            "police-source-id", "police_stations.geojson", "police-symbol-layer-id");
+                    @Override
+                    public void onClick(View view) {
+                        boolean checked = ((CheckBox) view).isChecked();
+                        if (checked) {
+                            //add hospital and police station symbol layers
+                            addIconSymbolLayer(R.drawable.hospital, "hospital-icon-id",
+                                    "hospital-source-id", "hospitals.geojson", "hospital-symbol-layer-id");
+                            addIconSymbolLayer(R.drawable.police_station, "police-icon-id",
+                                    "police-source-id", "police_stations.geojson", "police-symbol-layer-id");
 
 
-                                } else {
-                                    //remove layers
-                                    removeIconLayer("hospital-symbol-layer-id", "hospital-source-id");
-                                    removeIconLayer("police-symbol-layer-id", "police-source-id");
-                                }
-                            }
+                        } else {
+                            //remove layers
+                            removeIconLayer("hospital-symbol-layer-id", "hospital-source-id");
+                            removeIconLayer("police-symbol-layer-id", "police-source-id");
+                        }
+                    }
 
                 } );
 
@@ -409,10 +409,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             source.setGeoJson(Feature.fromGeometry(destinationPoint));
 
         }
-        getRoute(originPoint, destinationPoint);
+        getPublicRoute(originPoint, destinationPoint);
         button.setEnabled(true);
         return true;
     }
+
+
 
     //method to calculate route between user location and marker
     private void getRoute(Point origin, Point destination) {
@@ -421,7 +423,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .accessToken(Mapbox.getAccessToken())
                 .origin(origin)
                 .alternatives(true)
-                //.profile(PROFILE_DRIVING)
                 .destination(destination)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
@@ -468,6 +469,56 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //method for navigation on selected route
     public void onNewPrimaryRouteSelected(DirectionsRoute directionsRoute) {
         chosenRoute = directionsRoute;
+    }
+
+    //public transport using map matching
+    private void getPublicRoute(Point originPoint, Point destinationPoint){
+
+        NavigationRoute.Builder builder =NavigationRoute.builder(this)      //rename as builder to  put waypoints
+                .accessToken(Mapbox.getAccessToken())
+                .origin(originPoint)
+                .destination(destinationPoint)
+                .profile(PROFILE_DRIVING);
+        for (Point waypoint : pt_points) {
+            builder.addWaypoint(waypoint);
+        }
+        builder.build()
+                .getRoute(new Callback<DirectionsResponse>() {
+                    @Override
+                    public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                        // You can get the generic HTTP info about the response
+                        Log.d(TAG, "Response code: " + response.code());
+                        if (response.body() == null) {
+                            Log.e(TAG, "No routes found, make sure you set the right user and access token.");
+                            return;
+                        } else if (response.body().routes().size() < 1) {
+                            Log.e(TAG, "No routes found");
+                            return;
+                        }
+
+                        chosenRoute = response.body().routes().get(0);
+
+                        // Draw the route on the map
+                        if (navigationMapRoute != null) {
+                            //deprecated function
+                            //navigationMapRoute.removeRoute();
+                            navigationMapRoute.updateRouteArrowVisibilityTo(false);
+                            navigationMapRoute.updateRouteVisibilityTo(false);
+                            navigationMapRoute.showAlternativeRoutes(true);
+
+                        } else {
+                            navigationMapRoute = new NavigationMapRoute(null, mapView, mapboxMap, R.style.NavigationMapRoute);
+                        }
+
+                        navigationMapRoute.addRoute(chosenRoute);
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+                        Log.e(TAG, "Error: " + throwable.getMessage());
+                    }
+                });
     }
 
     //method to enable the location component. This enables the user's current location to be seen on th map via a puck
@@ -595,6 +646,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     //get route
                     getRoute(originPoint, firstResultPoint);
+
                     button.setEnabled(true);
 
 
@@ -615,6 +667,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+
+
     //turning geojson files into feature collection
     private void getFeatureCollectionFromJson() throws IOException {
         try {
@@ -632,7 +686,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //taxi hub data to display
 
     //load points from geojson files in assets folder
-
     private String loadJsonFromAsset(String nameOfLocalFile) {
         try {
             InputStream is = getAssets().open(nameOfLocalFile);
@@ -662,7 +715,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
         mapboxMap.getStyle().addLayer(symbolLayer);
     }
-
     //remove icon layer
 
     private void removeIconLayer(String layerID, String sourceID ){
