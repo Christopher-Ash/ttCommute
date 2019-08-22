@@ -29,6 +29,7 @@ import android.widget.Toast;
 // Map initialization classes
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.geocoding.v5.MapboxGeocoding;
@@ -64,6 +65,9 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import static com.google.gson.internal.bind.TypeAdapters.URI;
+import static com.mapbox.api.directions.v5.DirectionsCriteria.ANNOTATION_SPEED;
+import static com.mapbox.api.directions.v5.DirectionsCriteria.GEOMETRY_POLYLINE;
+import static com.mapbox.api.directions.v5.DirectionsCriteria.OVERVIEW_FULL;
 import static com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_DRIVING;
 import static com.mapbox.api.geocoding.v5.MapboxGeocoding.*;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
@@ -75,8 +79,11 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 // Route calculation classes
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncherOptions;
+import com.mapbox.services.android.navigation.ui.v5.NavigationView;
+import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.ui.v5.route.OnRouteSelectionChangeListener;
+import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
@@ -97,17 +104,21 @@ import android.widget.Button;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapLongClickListener,
-        PermissionsListener,OnRouteSelectionChangeListener{
+        PermissionsListener,OnRouteSelectionChangeListener, MapboxMap.OnMapClickListener{
     // variables for adding location layer
     private MapView mapView;
     private MapboxMap mapboxMap;
     // variables for adding location layer
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
+    //navigation view
+    private NavigationView navigationView;
+    private MapboxNavigation mapboxNavigation;
     // variables for calculating and drawing a route
     private List <DirectionsRoute> currentRoute =  new ArrayList<>();
     private DirectionsRoute chosenRoute;
@@ -215,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 addUserLocations();
 
                 mapboxMap.addOnMapLongClickListener(MainActivity.this);
+                mapboxMap.addOnMapClickListener(MainActivity.this);
 
                 showTaxi.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -264,14 +276,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        boolean simulateRoute = false;
-                        NavigationLauncherOptions options = NavigationLauncherOptions.builder()
-                                .directionsRoute(chosenRoute)
-                                .shouldSimulateRoute(simulateRoute)
-                                .build();
-                        // Call this method with Context from within an Activity
-                        NavigationLauncher.startNavigation(MainActivity.this, options);
+                        if (chosenRoute == null) {
+                            Toast.makeText(MainActivity.this, "Route not found. Navigation halted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            boolean simulateRoute = false;
+                            NavigationLauncherOptions options = NavigationLauncherOptions.builder()
+                                    .directionsRoute(chosenRoute)
+                                    .shouldSimulateRoute(simulateRoute)
+                                    .build();
+                            // Call this method with Context from within an Activity
+                            NavigationLauncher.startNavigation(MainActivity.this, options);
 
+
+
+                        }
                     }
                 });
             }
@@ -379,6 +397,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         loadedMapStyle.addLayer(destinationSymbolLayer);
     }
 
+    //showing info
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+
+// Convert LatLng coordinates to screen pixel and only query the rendered features.
+        final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+
+        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
+
+        // Get the first feature within the list if one exist
+        if (features.size() > 0) {
+            Feature feature = features.get(0);
+
+            // Ensure the feature has properties defined
+            if (feature.properties() != null) {
+                for (Map.Entry<String, JsonElement> entry : feature.properties().entrySet()) {
+                    // Log all the properties
+                    Log.d(TAG, String.format("%s = %s", entry.getKey(), entry.getValue()));
+                }
+            }
+        }
+        return false;
+    }
+
 
     //method to drop marker and draw route when map is clicked
     @SuppressWarnings( {"MissingPermission"})
@@ -482,7 +524,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Point waypoint : pt_points) {
             builder.addWaypoint(waypoint);
         }
-        builder.build()
+        builder
+                .addWaypointIndices(0,1, pt_points.size(), pt_points.size()+1)
+                .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override
                     public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
@@ -520,6 +564,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
     }
+
+
+
 
     //method to enable the location component. This enables the user's current location to be seen on th map via a puck
     //It checks user permissions with respect to the access of user location as well
@@ -585,7 +632,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build(this);
         startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
         //option to clear recent history
-        PlaceAutocomplete.clearRecentHistory(this);
+        //PlaceAutocomplete.clearRecentHistory(this);
 
     }
 
@@ -775,6 +822,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        if (mapboxMap != null) {
+            mapboxMap.removeOnMapClickListener(this);
+            mapboxMap.removeOnMapLongClickListener(this);
+
+        }
     }
 
     @Override
