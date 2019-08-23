@@ -61,8 +61,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 //Set the minimum zoom level of the map camera
                 mapboxMap.setMinZoomPreference(2);
-
-
+    double[][] test = {{10.648328, -61.506224},{10.645588, -61.399541}};
+    RouteCalculator calcroute = new RouteCalculator();
+    double[][] results = calcroute.routecalc(test);
+    int x = 0;
 
             }
         });
