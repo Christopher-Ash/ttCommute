@@ -9,5 +9,7 @@
     <color name="mapboxPink">#ee4e8b</color>
     <color name="mapboxYellow">#d9d838</color>
     <color name="mapboxRed">#b43b71</color>
+    <color name="buttonBlue">#40444F</color>
+    <color name="BLACK">#000000</color>
 
 </resources>

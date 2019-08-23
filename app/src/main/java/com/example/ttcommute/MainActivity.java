@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double distance;
     private double duration;
     private Button pt;
+    private Button pvt;
 
 
 
@@ -232,14 +233,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //layer chips setup
                 showTaxi =  findViewById(R.id.checkBox);
                 showServices = findViewById(R.id.checkBox2);
+
+                //publica nad private transport button setup
                 pt = (Button)findViewById(R.id.button);
                 pt.setVisibility(View.INVISIBLE);
+
+                pvt = (Button)findViewById(R.id.button2);
+                pvt.setVisibility(View.INVISIBLE);
 
                 //Text view setup
                 info = (TextView)findViewById(R.id.textView);
                 //disable initially
                 info.setVisibility(View.INVISIBLE);
                 addUserLocations();
+
 
                 mapboxMap.addOnMapLongClickListener(MainActivity.this);
                 mapboxMap.addOnMapClickListener(MainActivity.this);
@@ -477,13 +484,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //method to calculate route between user location and marker
     private void getRoute(Point origin, Point destination) {
 
-        pt.setVisibility(View.VISIBLE);
-        pt.setOnClickListener(new View.OnClickListener() {
-                                  @Override
-                                  public void onClick(View v) {
-                                      getPublicRoute(origin, destination);
-                                  }
-                              });
+
         NavigationRoute.builder(this)      //rename as builder to  put waypoints
                 .accessToken(Mapbox.getAccessToken())
                 .origin(origin)
@@ -504,8 +505,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         currentRoute = response.body().routes();
-                        distance = response.body().routes().get(0).distance()/1000;
-                        duration = response.body().routes().get(0).duration()/60;
+                        distance = Math.round(response.body().routes().get(0).distance()/1000);
+                        duration = Math.round(response.body().routes().get(0).duration()/60);
+
+                        //make public and private buttons appear
+                        pt.setVisibility(View.VISIBLE);
+                        pvt.setVisibility(View.VISIBLE);
+
+                        pt.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getPublicRoute(origin, destination);
+                                pt.setTextColor(getResources().getColor(R.color.mapboxWhite));
+                                pt.setBackgroundColor(getResources().getColor(R.color.buttonBlue));
+                                pvt.setTextColor(getResources().getColor(R.color.BLACK));
+                                pvt.setBackgroundColor(getResources().getColor(R.color.mapboxWhite));
+                            }
+
+                        });
 
 
                         if(info.getVisibility() == View.INVISIBLE){
@@ -513,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         //set text view to display info
-                        info.setText("Distance: " + distance + "km\nDuration: " +duration);
+                        info.setText("Distance: " + distance + "km\nDuration: " +duration+"min");
 
 
                         // Draw the route on the map
@@ -545,9 +562,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //method for navigation on selected route
     public void onNewPrimaryRouteSelected(DirectionsRoute directionsRoute) {
         chosenRoute = directionsRoute;
-        distance = chosenRoute.distance()/1000;
-        duration = chosenRoute.duration()/60;
-        info.setText("Distance: " + distance + "km\nDuration: " +duration);
+        distance = Math.round(chosenRoute.distance()/1000);
+        duration = Math.round(chosenRoute.duration()/60);
+        info.setText("Distance: " + distance + "km\nDuration: " +duration+"min");
     }
 
     //public transport using map matching
@@ -579,15 +596,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         chosenRoute = response.body().routes().get(0);
-                        distance = response.body().routes().get(0).distance()/1000;
-                        duration = response.body().routes().get(0).duration()/3600;
+                        distance = Math.round(response.body().routes().get(0).distance()/1000);
+                        duration = Math.round(response.body().routes().get(0).duration()/60);
+
+                        pvt.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getRoute(originPoint, destinationPoint);
+                                pvt.setTextColor(getResources().getColor(R.color.mapboxWhite));
+                                pvt.setBackgroundColor(getResources().getColor(R.color.buttonBlue));
+                                pt.setTextColor(getResources().getColor(R.color.BLACK));
+                                pt.setBackgroundColor(getResources().getColor(R.color.mapboxWhite));
+                            }
+
+                        });
 
                         if(info.getVisibility() == View.INVISIBLE){
                             info.setVisibility(View.VISIBLE);
                         }
 
                         //set text view to display info
-                        info.setText("Distance: " + distance + "km\nDuration: " +duration+ "min\nCost: $" +cost);
+                        info.setText("\nDistance: " + distance + "km\nDuration: " +duration+ "min\nCost: $" +cost);
 
 
 

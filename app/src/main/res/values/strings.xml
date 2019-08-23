@@ -10,7 +10,7 @@
     <string name="police_url">https://studio.mapbox.com/datasets/agiledvlprs/cjzam1cpm033v2tt65yi4m7h6/</string>
     <string name="hospital_url">https://studio.mapbox.com/datasets/agiledvlprs/cjzankl8n039n2nob5mjwd6op/</string>
     <string name="routes_url">https://studio.mapbox.com/datasets/agiledvlprs/cjzkeleh60mq22oqmu05cmdde/</string>
-    <string name="taxi_stands" />
-    <string name="essential_services" />
+    <string name="taxi_stands" >Transport Hubs</string>
+    <string name="essential_services" >Essential Sevices</string>
 
 </resources>

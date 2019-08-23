@@ -14,15 +14,15 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:clickable="true"
+        android:focusable="true"
         mapbox:backgroundTint="#9C2929"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
-        mapbox:layout_constraintHorizontal_bias="0.925"
+        mapbox:layout_constraintHorizontal_bias="0.927"
         mapbox:layout_constraintStart_toStartOf="@+id/mapView"
         mapbox:layout_constraintTop_toTopOf="parent"
-        mapbox:layout_constraintVertical_bias="0.655"
-        mapbox:srcCompat="@drawable/ic_navigation"
-        android:focusable="true" />
+        mapbox:layout_constraintVertical_bias="0.899"
+        mapbox:srcCompat="@drawable/ic_navigation" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/searchbutton"
@@ -44,14 +44,13 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="311dp"
-        android:layout_height="68dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="#FFFFFF"
-        android:elevation="4dp"
-        android:text="TextView"
+        android:elevation="3dp"
         android:textColor="#2D5972"
         mapbox:fontFamily="@font/roboto_black"
         mapbox:layout_constraintBottom_toBottomOf="@+id/mapView"
@@ -62,18 +61,36 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="100dp"
-        android:layout_height="67dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#FFFFFF"
+        android:text="Public"
+        android:textColor="#000000"
+        android:elevation="3dp"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintHorizontal_bias="0.498"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintTop_toTopOf="@+id/mapView"
+        mapbox:layout_constraintVertical_bias="0.761" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:elevation="6dp"
-        android:text="Public"
+        android:background="#40444F"
+        android:text="Private"
+        android:textColor="#FFFFFF"
+        android:elevation="3dp"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="@+id/mapView"
-        mapbox:layout_constraintHorizontal_bias="0.792"
-        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintHorizontal_bias="0.133"
+        mapbox:layout_constraintStart_toStartOf="@+id/mapView"
         mapbox:layout_constraintTop_toTopOf="parent"
-        mapbox:layout_constraintVertical_bias="0.911" />
+        mapbox:layout_constraintVertical_bias="0.761" />
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
@@ -92,14 +109,16 @@
 
         <CheckBox
             android:id="@+id/checkBox"
-            android:layout_width="115dp"
+            android:layout_width="190dp"
             android:layout_height="98dp"
+            android:backgroundTint="#40444F"
             android:text="@string/taxi_stands" />
 
         <CheckBox
             android:id="@+id/checkBox2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="#40444F"
             android:text="@string/essential_services" />
 
     </com.mapbox.mapboxsdk.maps.MapView>
