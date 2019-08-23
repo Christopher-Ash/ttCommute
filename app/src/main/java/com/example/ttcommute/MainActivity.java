@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Parcelable;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 // Map initialization classes
@@ -66,6 +67,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import static com.google.gson.internal.bind.TypeAdapters.URI;
 import static com.mapbox.api.directions.v5.DirectionsCriteria.ANNOTATION_SPEED;
+import static com.mapbox.api.directions.v5.DirectionsCriteria.DESTINATION_ANY;
 import static com.mapbox.api.directions.v5.DirectionsCriteria.GEOMETRY_POLYLINE;
 import static com.mapbox.api.directions.v5.DirectionsCriteria.OVERVIEW_FULL;
 import static com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_DRIVING;
@@ -138,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FeatureCollection featureCollection;
     private FeatureCollection featureCollection2;
     private FeatureCollection featureCollection3;
+    private FeatureCollection featureCollection4;
     private static final String PROPERTY_SELECTED = "selected";
     //filter display variables
     private CheckBox showTaxi;            //chip to show taxis
@@ -147,6 +150,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private CarmenFeature cf_taxistand;
     //waypoint variables
     private List<Point> pt_points = new ArrayList<>();
+    //TextView to show route info
+    private TextView info;
+    private int cost;
+    private double distance;
+    private double duration;
+    private Button pt;
+
 
 
 
@@ -166,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //adding waypoints
-        pt_points.add(Point.fromLngLat(-61.22651474111301, 10.627847164740515));
+     /*   pt_points.add(Point.fromLngLat(-61.22651474111301, 10.627847164740515));
         pt_points.add(Point.fromLngLat( -61.226810293009336, 10.629474955668414));
         pt_points.add(Point.fromLngLat( -61.24142911690379, 10.629349883107878));
         pt_points.add(Point.fromLngLat(  -61.2541131781645, 10.620464117381403));
@@ -182,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         pt_points.add(Point.fromLngLat(  -61.30554507092826, 10.626252983950707));
         pt_points.add(Point.fromLngLat(-61.320727718501686, 10.627820260727674));
         pt_points.add(Point.fromLngLat( -61.33081205100312, 10.635126755007192));
-        pt_points.add(Point.fromLngLat(  -61.33512428227614, 10.63559030333208));
+        pt_points.add(Point.fromLngLat(  -61.33512428227614, 10.63559030333208));*/
 
 
         Mapbox.getInstance(this, getString(R.string.access_token));
@@ -222,7 +232,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //layer chips setup
                 showTaxi =  findViewById(R.id.checkBox);
                 showServices = findViewById(R.id.checkBox2);
+                pt = (Button)findViewById(R.id.button);
+                pt.setVisibility(View.INVISIBLE);
 
+                //Text view setup
+                info = (TextView)findViewById(R.id.textView);
+                //disable initially
+                info.setVisibility(View.INVISIBLE);
                 addUserLocations();
 
                 mapboxMap.addOnMapLongClickListener(MainActivity.this);
@@ -451,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             source.setGeoJson(Feature.fromGeometry(destinationPoint));
 
         }
-        getPublicRoute(originPoint, destinationPoint);
+        getRoute(originPoint, destinationPoint);
         button.setEnabled(true);
         return true;
     }
@@ -461,7 +477,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //method to calculate route between user location and marker
     private void getRoute(Point origin, Point destination) {
 
-       NavigationRoute.builder(this)      //rename as builder to  put waypoints
+        pt.setVisibility(View.VISIBLE);
+        pt.setOnClickListener(new View.OnClickListener() {
+                                  @Override
+                                  public void onClick(View v) {
+                                      getPublicRoute(origin, destination);
+                                  }
+                              });
+        NavigationRoute.builder(this)      //rename as builder to  put waypoints
                 .accessToken(Mapbox.getAccessToken())
                 .origin(origin)
                 .alternatives(true)
@@ -481,6 +504,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         currentRoute = response.body().routes();
+                        distance = response.body().routes().get(0).distance()/1000;
+                        duration = response.body().routes().get(0).duration()/60;
+
+
+                        if(info.getVisibility() == View.INVISIBLE){
+                            info.setVisibility(View.VISIBLE);
+                        }
+
+                        //set text view to display info
+                        info.setText("Distance: " + distance + "km\nDuration: " +duration);
+
 
                         // Draw the route on the map
                         if (navigationMapRoute != null) {
@@ -506,15 +540,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.e(TAG, "Error: " + throwable.getMessage());
                     }
                 });
-    }
 
+    }
     //method for navigation on selected route
     public void onNewPrimaryRouteSelected(DirectionsRoute directionsRoute) {
         chosenRoute = directionsRoute;
+        distance = chosenRoute.distance()/1000;
+        duration = chosenRoute.duration()/60;
+        info.setText("Distance: " + distance + "km\nDuration: " +duration);
     }
 
     //public transport using map matching
     private void getPublicRoute(Point originPoint, Point destinationPoint){
+        publicRouteInfo(originPoint, destinationPoint);
 
         NavigationRoute.Builder builder =NavigationRoute.builder(this)      //rename as builder to  put waypoints
                 .accessToken(Mapbox.getAccessToken())
@@ -541,6 +579,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         chosenRoute = response.body().routes().get(0);
+                        distance = response.body().routes().get(0).distance()/1000;
+                        duration = response.body().routes().get(0).duration()/3600;
+
+                        if(info.getVisibility() == View.INVISIBLE){
+                            info.setVisibility(View.VISIBLE);
+                        }
+
+                        //set text view to display info
+                        info.setText("Distance: " + distance + "km\nDuration: " +duration+ "min\nCost: $" +cost);
+
+
 
                         // Draw the route on the map
                         if (navigationMapRoute != null) {
@@ -563,6 +612,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.e(TAG, "Error: " + throwable.getMessage());
                     }
                 });
+
+
+
+    }
+
+    private void publicRouteInfo(Point originPoint, Point destinationPoint){
+
+        List<Feature> features = featureCollection4.features();
+        Feature feature = features.get(0);
+
+        pt_points = ((LineString) Objects.requireNonNull(feature.geometry())).coordinates();
+
+        cost = 10;
+
     }
 
 
@@ -723,6 +786,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             featureCollection = FeatureCollection.fromJson(loadJsonFromAsset("taxi_stands.geojson"));
             featureCollection2 = FeatureCollection.fromJson(loadJsonFromAsset("police_stations.geojson"));
             featureCollection3 = FeatureCollection.fromJson(loadJsonFromAsset("hospitals.geojson"));
+            featureCollection4 = FeatureCollection.fromJson(loadJsonFromAsset("publicroutes.geojson"));
+
 
         } catch (Exception exception) {
             Log.e("MapActivity", "getFeatureCollectionFromJson: " + exception);
