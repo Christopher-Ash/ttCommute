@@ -6,40 +6,26 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Parcelable;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
 // Map initialization classes
-import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
-import com.mapbox.api.matching.v5.MapboxMapMatching;
-import com.mapbox.api.matching.v5.models.MapMatchingResponse;
 import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.LineString;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
@@ -65,13 +51,7 @@ import com.mapbox.mapboxsdk.plugins.places.picker.model.PlacePickerOptions;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
-import static com.google.gson.internal.bind.TypeAdapters.URI;
-import static com.mapbox.api.directions.v5.DirectionsCriteria.ANNOTATION_SPEED;
-import static com.mapbox.api.directions.v5.DirectionsCriteria.DESTINATION_ANY;
-import static com.mapbox.api.directions.v5.DirectionsCriteria.GEOMETRY_POLYLINE;
-import static com.mapbox.api.directions.v5.DirectionsCriteria.OVERVIEW_FULL;
 import static com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_DRIVING;
-import static com.mapbox.api.geocoding.v5.MapboxGeocoding.*;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
@@ -82,7 +62,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 // Route calculation classes
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncherOptions;
 import com.mapbox.services.android.navigation.ui.v5.NavigationView;
-import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.ui.v5.route.OnRouteSelectionChangeListener;
 import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation;
@@ -95,8 +74,6 @@ import retrofit2.Response;
 import android.util.Log;
 
 //classes needed for map restriction
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
 
@@ -105,9 +82,6 @@ import android.view.View;
 import android.widget.Button;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
 import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapLongClickListener,
@@ -141,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FeatureCollection featureCollection2;
     private FeatureCollection featureCollection3;
     private FeatureCollection featureCollection4;
+    private  String propertyName = "";
+    private  String propertyName2 = "";
+    private  String propertyName3 = "";
     private static final String PROPERTY_SELECTED = "selected";
     //filter display variables
     private CheckBox showTaxi;            //chip to show taxis
@@ -152,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Point> pt_points = new ArrayList<>();
     //TextView to show route info
     private TextView info;
-    private int cost;
+    private double cost;
     private double distance;
     private double duration;
     private Button pt;
@@ -176,24 +153,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //adding waypoints
-     /*   pt_points.add(Point.fromLngLat(-61.22651474111301, 10.627847164740515));
-        pt_points.add(Point.fromLngLat( -61.226810293009336, 10.629474955668414));
-        pt_points.add(Point.fromLngLat( -61.24142911690379, 10.629349883107878));
-        pt_points.add(Point.fromLngLat(  -61.2541131781645, 10.620464117381403));
-        pt_points.add(Point.fromLngLat( -61.26560529749544, 10.64244596927449));
-        pt_points.add(Point.fromLngLat(-61.27379146469815, 10.641031398022207));
-        pt_points.add(Point.fromLngLat(-61.27918893757342, 10.641473452249429));
-        pt_points.add(Point.fromLngLat( -61.281657, 10.641611));
-        pt_points.add(Point.fromLngLat(-61.282518, 10.641558));
-        pt_points.add(Point.fromLngLat(-61.28452294350522, 10.641196972327819));
-        pt_points.add(Point.fromLngLat(  -61.283916535985526, 10.638724752994207));
-        pt_points.add(Point.fromLngLat( -61.292338862708775, 10.634332099573243));
-        pt_points.add(Point.fromLngLat(   -61.29462973553771, 10.6285266364807));
-        pt_points.add(Point.fromLngLat(  -61.30554507092826, 10.626252983950707));
-        pt_points.add(Point.fromLngLat(-61.320727718501686, 10.627820260727674));
-        pt_points.add(Point.fromLngLat( -61.33081205100312, 10.635126755007192));
-        pt_points.add(Point.fromLngLat(  -61.33512428227614, 10.63559030333208));*/
 
 
         Mapbox.getInstance(this, getString(R.string.access_token));
@@ -231,18 +190,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 addDestinationIconSymbolLayer(style);
 
                 //layer chips setup
-                showTaxi =  findViewById(R.id.checkBox);
+                showTaxi = findViewById(R.id.checkBox);
                 showServices = findViewById(R.id.checkBox2);
 
                 //publica nad private transport button setup
-                pt = (Button)findViewById(R.id.button);
+                pt = (Button) findViewById(R.id.button);
                 pt.setVisibility(View.INVISIBLE);
 
-                pvt = (Button)findViewById(R.id.button2);
+                pvt = (Button) findViewById(R.id.button2);
                 pvt.setVisibility(View.INVISIBLE);
 
                 //Text view setup
-                info = (TextView)findViewById(R.id.textView);
+                info = (TextView) findViewById(R.id.textView);
                 //disable initially
                 info.setVisibility(View.INVISIBLE);
                 addUserLocations();
@@ -284,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
 
-                } );
+                });
 
                 search = findViewById(R.id.searchbutton);
                 search.setOnClickListener(new View.OnClickListener() {
@@ -311,95 +270,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             NavigationLauncher.startNavigation(MainActivity.this, options);
 
 
-
                         }
                     }
                 });
             }
         });
-
-        List<Feature> featureList = featureCollection.features();
-        List<Feature> featureList2 = featureCollection2.features();
-        List<Feature> featureList3 = featureCollection3.features();
-
-
-        if (featureList != null) {
-
-            for (int x = 0; x < featureList.size(); x++) {
-
-                Feature singleLocation = featureList.get(x);
-
-                // Get the single location's String properties to place in its map marker
-                String singleLocationName = singleLocation.getStringProperty("name");
-            }
-        }
-
-        if (featureList2 != null) {
-
-            for (int x = 0; x < featureList2.size(); x++) {
-
-                Feature singleLocation = featureList2.get(x);
-
-                // Get the single location's String properties to place in its map marker
-                String singleLocationName = singleLocation.getStringProperty("name");
-            }
-        }
-
-        if (featureList3 != null) {
-
-            for (int x = 0; x < featureList3.size(); x++) {
-
-                Feature singleLocation = featureList3.get(x);
-
-                // Get the single location's String properties to place in its map marker
-                String singleLocationName = singleLocation.getStringProperty("name");
-            }
-        }
-
-
-        //calling method to show markers
-
-
-        /*
-
-        //deals with how selected icon is presented
-
-        initSelectedTaxiSymbolLayer();
-
-        // Create a list of features from the feature collection
-        List<Feature> featureList = featureCollection.features();
-
-        // Retrieve and update the source designated for showing the store location icons
-        GeoJsonSource source = mapboxMap.getStyle().getSourceAs("store-location-source-id");
-        if (source != null) {
-            source.setGeoJson(FeatureCollection.fromFeatures(featureList));
-        }
-
-        if (featureList != null) {
-
-            for (int x = 0; x < featureList.size(); x++) {
-
-                Feature singleLocation = featureList.get(x);
-
-                // Get the single location's String properties to place in its map marker
-                String singleLocationName = singleLocation.getStringProperty("name");
-                String singleLocationHours = singleLocation.getStringProperty("hours");
-                String singleLocationDescription = singleLocation.getStringProperty("description");
-                String singleLocationPhoneNum = singleLocation.getStringProperty("phone");
-
-
-                // Add a boolean property to use for adjusting the icon of the selected store location
-                singleLocation.addBooleanProperty(PROPERTY_SELECTED, false);
-
-                // Get the single location's LatLng coordinates
-                Point singleLocationPosition = (Point) singleLocation.geometry();
-
-                // Create a new LatLng object with the Position object created above
-                LatLng singleLocationLatLng = new LatLng(singleLocationPosition.latitude(),
-                        singleLocationPosition.longitude());
-
-            }
-        }*/
     }
 
     //checkbox method
@@ -424,22 +299,43 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
 
-// Convert LatLng coordinates to screen pixel and only query the rendered features.
+        // Convert LatLng coordinates to screen pixel and only query the rendered features.
         final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
 
-        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
+        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel, "police-symbol-layer-id");
+        List<Feature> features2 = mapboxMap.queryRenderedFeatures(pixel, "taxi-symbol-layer-id");
+        List<Feature> features3= mapboxMap.queryRenderedFeatures(pixel, "hospital-symbol-layer-id");
+
+        Point origin = Point.fromLngLat(locationComponent.getLastKnownLocation().getLongitude(),
+                locationComponent.getLastKnownLocation().getLatitude());
 
         // Get the first feature within the list if one exist
         if (features.size() > 0) {
             Feature feature = features.get(0);
-
-            // Ensure the feature has properties defined
-            if (feature.properties() != null) {
-                for (Map.Entry<String, JsonElement> entry : feature.properties().entrySet()) {
-                    // Log all the properties
-                    Log.d(TAG, String.format("%s = %s", entry.getKey(), entry.getValue()));
-                }
+            propertyName = feature.getStringProperty("name");
+            if(info.getVisibility() == View.INVISIBLE){
+                info.setVisibility(View.VISIBLE);
             }
+            info.setText(propertyName);
+        }
+        if(features2.size()>0) {
+            Feature feature2 = features2.get(0);
+            propertyName2 = feature2.getStringProperty("name");
+            if(info.getVisibility() == View.INVISIBLE){
+                info.setVisibility(View.VISIBLE);
+            }
+            info.setText(propertyName2);
+        }
+
+        if(features3.size()>0) {
+            Feature feature3 = features3.get(0);
+            propertyName3 = feature3.getStringProperty("name");
+            if(info.getVisibility() == View.INVISIBLE){
+                info.setVisibility(View.VISIBLE);
+            }
+            info.setText(propertyName3);
+
+
         }
         return false;
     }
@@ -512,9 +408,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         pt.setVisibility(View.VISIBLE);
                         pvt.setVisibility(View.VISIBLE);
 
+
+                        //onclick listener for public routing button
                         pt.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                //set button colors
                                 getPublicRoute(origin, destination);
                                 pt.setTextColor(getResources().getColor(R.color.mapboxWhite));
                                 pt.setBackgroundColor(getResources().getColor(R.color.buttonBlue));
@@ -524,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         });
 
-
+                        //set visibility of text view with route info
                         if(info.getVisibility() == View.INVISIBLE){
                             info.setVisibility(View.VISIBLE);
                         }
@@ -569,8 +468,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //public transport using map matching
     private void getPublicRoute(Point originPoint, Point destinationPoint){
+
+        //clear pt_points array list foor waypoints
+        pt_points.clear();
+
+        //call method to get route information. This method uses the class RouteCalculator
         publicRouteInfo(originPoint, destinationPoint);
 
+
+        //build route
         NavigationRoute.Builder builder =NavigationRoute.builder(this)      //rename as builder to  put waypoints
                 .accessToken(Mapbox.getAccessToken())
                 .origin(originPoint)
@@ -580,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             builder.addWaypoint(waypoint);
         }
         builder
-                .addWaypointIndices(0,1, pt_points.size(), pt_points.size()+1)
+                .addWaypointIndices(0,1,pt_points.size(),pt_points.size()+1)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override
@@ -603,6 +509,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             @Override
                             public void onClick(View v) {
                                 getRoute(originPoint, destinationPoint);
+                                //set button aand text colors
                                 pvt.setTextColor(getResources().getColor(R.color.mapboxWhite));
                                 pvt.setBackgroundColor(getResources().getColor(R.color.buttonBlue));
                                 pt.setTextColor(getResources().getColor(R.color.BLACK));
@@ -611,12 +518,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         });
 
+                        //set visibility of text view with route info
                         if(info.getVisibility() == View.INVISIBLE){
                             info.setVisibility(View.VISIBLE);
                         }
 
                         //set text view to display info
-                        info.setText("\nDistance: " + distance + "km\nDuration: " +duration+ "min\nCost: $" +cost);
+                        info.setText("Distance: " + distance + "km\nDuration: " +duration+ "min\nCost: $" +cost+"0");
 
 
 
@@ -646,14 +554,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void publicRouteInfo(Point originPoint, Point destinationPoint){
+    public void publicRouteInfo(Point originPoint, Point destinationPoint){
 
-        List<Feature> features = featureCollection4.features();
-        Feature feature = features.get(0);
+        //Route Calculator class uses
 
-        pt_points = ((LineString) Objects.requireNonNull(feature.geometry())).coordinates();
+        RouteCalculator calcroute = new RouteCalculator();
 
-        cost = 10;
+        //conver origin and user destination to 2D double arrays. Note it was put in the form (lat, lng) because of the calculato
+        //origin
+        double origin_a = (originPoint.longitude());
+        double origin_b =(originPoint.latitude());
+        double[] origin = {origin_b, origin_a};
+        //destination
+        double destination_a = (destinationPoint.longitude());
+        double destination_b = (destinationPoint.latitude());
+        double[]destination ={destination_b, destination_a};
+        double[][] myPoint = {origin, destination};
+
+        //calculating required waypoints
+        double[][] results = calcroute.routecalc(myPoint);
+
+        //extracting waypoints from results array
+        for( int i =0; i<23;i++){
+            double a1  = results[i][0];
+            double a2 = results[i][1];
+            pt_points.add(Point.fromLngLat(a2,a1));
+        }
+        //extracting cost from results array
+        cost = Math.round(results[23][0]);
 
     }
 
