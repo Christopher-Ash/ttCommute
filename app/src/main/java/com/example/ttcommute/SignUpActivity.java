@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SignUpActivity extends AppCompatActivity {
 
-
+    //variables for sign up
     private EditText username, email, password;                          //fields to fill
     private Button btn_signup;                                          //sign up button
     private TextView existingaccount;                                  //sign in option for existing account
@@ -36,11 +36,20 @@ public class SignUpActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
+        //matching xml objects with variables so they can be used in activity
         username = (EditText) findViewById(R.id.username_signup);
         email = (EditText) findViewById(R.id.email_signup);
         password = (EditText) findViewById(R.id.password_signup);
         btn_signup = (Button) findViewById(R.id.button_signup);
         existingaccount = (TextView) findViewById(R.id.text_existingaccount);
+
+        //redirects to login page
+        existingaccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+            }
+        });
 
         //what happens when sign up button is clicked
         btn_signup.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +65,8 @@ public class SignUpActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success
-                                sendEmailVerify();;
+                                sendEmailVerify();
+                                ;
                                 //Toast.makeText(SignUpActivity.this, "Registration Complete! Verification Email has been sent to you", Toast.LENGTH_LONG).show();
                                 startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
 
@@ -66,16 +76,9 @@ public class SignUpActivity extends AppCompatActivity {
                             }
                         }
                     });
-
-                    //redirects to login page
-                    existingaccount.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
-                        }
-                    });
                 }
             }
+
 
             //Ensuring all requested fields are entered
             private Boolean validate() {

@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class PasswordResetActivity extends AppCompatActivity {
 
+    //variables for reset password
     private Button ResetPassword;
     private EditText Email_Reset;
     private FirebaseAuth firebaseAuth;
@@ -28,9 +29,11 @@ public class PasswordResetActivity extends AppCompatActivity {
         //Firebase Instance
         firebaseAuth = FirebaseAuth.getInstance();
 
+        //setting up xml buttons
         ResetPassword = (Button) findViewById(R.id.button_passwordreset);
         Email_Reset = (EditText) findViewById(R.id.email_passwordreset);
 
+        //when user clicks on button email is sent through firebase api to user to reset password
         ResetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

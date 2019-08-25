@@ -14,15 +14,15 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:clickable="true"
+        android:focusable="true"
         mapbox:backgroundTint="#9C2929"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
-        mapbox:layout_constraintHorizontal_bias="0.925"
+        mapbox:layout_constraintHorizontal_bias="0.927"
         mapbox:layout_constraintStart_toStartOf="@+id/mapView"
         mapbox:layout_constraintTop_toTopOf="parent"
-        mapbox:layout_constraintVertical_bias="0.655"
-        mapbox:srcCompat="@drawable/ic_navigation"
-        android:focusable="true" />
+        mapbox:layout_constraintVertical_bias="0.899"
+        mapbox:srcCompat="@drawable/ic_navigation" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/searchbutton"
@@ -42,32 +42,106 @@
         mapbox:srcCompat="@android:drawable/ic_menu_search"
         android:focusable="true" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="#FFFFFF"
+        android:elevation="3dp"
+        android:textColor="#2D5972"
+        app:fontFamily="sans-serif-black"
+        mapbox:layout_constraintBottom_toBottomOf="@+id/mapView"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintTop_toTopOf="@+id/mapView"
+        mapbox:layout_constraintVertical_bias="0.945" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#FFFFFF"
+        android:text="Public"
+        android:textColor="#000000"
+        android:elevation="3dp"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintHorizontal_bias="0.498"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        mapbox:layout_constraintTop_toTopOf="@+id/mapView"
+        mapbox:layout_constraintVertical_bias="0.761" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="#40444F"
+        android:text="Private"
+        android:textColor="#FFFFFF"
+        android:elevation="3dp"
+        mapbox:layout_constraintBottom_toBottomOf="parent"
+        mapbox:layout_constraintEnd_toEndOf="@+id/mapView"
+        mapbox:layout_constraintHorizontal_bias="0.133"
+        mapbox:layout_constraintStart_toStartOf="@+id/mapView"
+        mapbox:layout_constraintTop_toTopOf="parent"
+        mapbox:layout_constraintVertical_bias="0.761" />
+
+    <Button
+        android:id="@+id/button_logout"
+        android:layout_width="82dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="3dp"
+        android:text="@string/logout"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#BF2632"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.972"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.023" />
+
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         mapbox:layout_constraintBottom_toBottomOf="parent"
         mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintHorizontal_bias="1.0"
         mapbox:layout_constraintStart_toStartOf="parent"
         mapbox:layout_constraintTop_toTopOf="parent"
+        mapbox:layout_constraintVertical_bias="0.0"
         mapbox:mapbox_cameraTargetLat="10.6918"
         mapbox:mapbox_cameraTargetLng="-61.2225"
         mapbox:mapbox_cameraTilt="0"
-        mapbox:mapbox_cameraZoom="8.51" />
+        mapbox:mapbox_cameraZoom="8.51">
 
-    <Button
-        android:id="@+id/button_logout"
-        android:layout_width="133dp"
-        android:layout_height="71dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/logout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="190dp"
+            android:layout_height="98dp"
+            android:backgroundTint="#40444F"
+            android:text="@string/taxi_stands" />
+
+        <CheckBox
+            android:id="@+id/checkBox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#40444F"
+            android:text="@string/essential_services" />
+
+    </com.mapbox.mapboxsdk.maps.MapView>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

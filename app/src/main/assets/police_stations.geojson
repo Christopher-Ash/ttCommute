@@ -1,0 +1,61 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Tunapuna Police Station"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.38977,
+          10.64496
+        ],
+        "type": "Point"
+      },
+      "id": "2f6784cc2f6657d42a49b38ddf132835"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cumuto Police Station"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.208454,
+          10.589439
+        ],
+        "type": "Point"
+      },
+      "id": "3a053290155f79f0db325ee76c84913c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Arima Police Station"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.282368,
+          10.641549
+        ],
+        "type": "Point"
+      },
+      "id": "584d01ce7eccc9275efa9a29e9893439"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Arouca Police Station"
+      },
+      "geometry": {
+        "coordinates": [
+          -61.349769,
+          10.638707
+        ],
+        "type": "Point"
+      },
+      "id": "f3726baae9da2ca2246a0886460bb140"
+    }
+  ],
+  "type": "FeatureCollection"
+}

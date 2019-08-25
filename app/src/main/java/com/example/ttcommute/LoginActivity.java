@@ -48,27 +48,31 @@ import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity {
+    //variables for xml objects
     private EditText UserName, PassWord;
     private Button FBLogin, Login;
     private TextView ForgotPassword, SkipLogin, SignUp;
-    private int counter = 10;
-    private FirebaseAuth mAuth;
     private SignInButton GoogleLogin;
+    //variable for counting number of failed attempts to log in
+    private int counter = 10;
+    //Firebase Authentication variables
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    //Login variables for email, Google Sign In and Facebook
     private static final int RC_SIGN_IN = 1;
     private GoogleApiClient mGoogleSignInClient;
     private static final String TAG = "Main";
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private CallbackManager mCallbackManager;
     private static final String TAGFB ="FBLg";
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_2);
 
+        //initialize instance of FirebasAuth.
         mAuth = FirebaseAuth.getInstance();
+        //checking user's login status and redirecting to hoomepage if logged in
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -77,19 +81,16 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-
-
-        //Checking if user has logged in
-        FirebaseUser user = mAuth.getCurrentUser();
+        //
+       /* FirebaseUser user = mAuth.getCurrentUser();
 
         //if user is signed in go to homepage
         if (user != null) {
             finish();
             startActivity(new Intent(LoginActivity.this, HomePageActivity.class));
-        }
+        }*/
 
         //mapping xml object id's to variables used here
-
         UserName = (EditText) findViewById(R.id.username_login);
         PassWord = (EditText) findViewById(R.id.password_login);
         GoogleLogin = (SignInButton) findViewById(R.id.button_googlelogin);
@@ -98,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
         SkipLogin = (TextView) findViewById(R.id.skip_login);
         SignUp = (TextView) findViewById(R.id.text_signup);
 
-        //Skip Login
+        //skip login and go to homepage activity
         SkipLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -122,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //forgot password button configuration
+        //forgot password button configuration. when clicked user will be redirected to password reset page
         ForgotPassword.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -132,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //remove cursoor on login page
+        //remove cursoor on login page until touched
         UserName.setFocusable(false);
         PassWord.setFocusable(false);
 
@@ -156,12 +157,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-
-        // Configure Google Sign In
+        // configuring Google Sign In using Google sign in client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -184,7 +180,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //Configure Facebook Sign-in
+
+        //configuring Facebook Sign-in
         // Initialize Facebook Login button
         mCallbackManager = CallbackManager.Factory.create();
         LoginButton loginButton = findViewById(R.id.button_fblogin);
@@ -227,6 +224,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    //Google and Facebook Sign in Activity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -252,6 +250,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     }
+
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
@@ -278,8 +277,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-
-
+    //email sign in activity
     private void validate(String Username, String Password) {
         if (Username.isEmpty() || Password.isEmpty()) {
             Toast.makeText(LoginActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
@@ -305,7 +303,8 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
     }
-    //Email Verification Method
+
+    //Email Verification Method: Checking to see if user has verified their email before signing in
     private void checkVerifyEmail(){
         FirebaseUser firebaseUser = mAuth.getInstance().getCurrentUser();
         Boolean email_ver = firebaseUser.isEmailVerified();
